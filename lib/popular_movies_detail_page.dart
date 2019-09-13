@@ -55,12 +55,133 @@ class _PopularMoviesDetailPageState extends State<PopularMoviesDetailPage>
                 ),
               ),
             ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  _createMovieInformationWidget(),
+                  createAnimatedMovieOverviewAndTicketInformationWidget(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
+  Widget createAnimatedMovieOverviewAndTicketInformationWidget() {
+    return AnimatedBuilder(
+      animation: _animationController,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          CupertinoSegmentedControl(
+            groupValue: currentValue,
+            children: const <int, Widget>{
+              0: Text('Storyline'),
+              1: Text('Tickets'),
+            },
+            onValueChanged: (value) {
+              if (value == 0) {
+                currentTab = Padding(
+                  padding: EdgeInsets.only(left: 16, top: 16, right: 16),
+                  child: Text(widget.movie.plot),
+                );
+              } else {
+                currentTab = Padding(
+                  padding: EdgeInsets.only(left: 16, top: 16, right: 16),
+                  child: Column(
+                    children: _createCinemaList(widget.movie.cinemas),
+                  ),
+                );
+              }
+              setState(() {
+                currentValue = value;
+              });
+            },
+          ),
+          currentTab ??
+              Padding(
+                padding: EdgeInsets.only(left: 16, top: 16, right: 16),
+                child: Text(widget.movie.plot),
+              )
+        ],
+      ),
+      builder: (BuildContext context, Widget child) {
+        return Opacity(
+          opacity: _animationController.value,
+          child: FractionalTranslation(
+            translation: _movieInformationSlidingAnimation.value,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _createMovieInformationWidget() {
+    return Row(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.all(16),
+          child: Hero(
+            tag: widget.movie.title,
+            child: Image.asset(
+              widget.movie.posterPath,
+              height: 200,
+            ),
+          ),
+        ),
+        Container(
+          height: 200,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(widget.movie.title),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: StarRating(
+                  rating: widget.movie.rate.toDouble(),
+                  color: Color(0xFFF6C32C),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Icon(Icons.date_range),
+                    ),
+                    Text(widget.movie.releaseDate)
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Icon(Icons.timer),
+                    ),
+                    Text(widget.movie.duration.toString())
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
   List<Widget> _createCinemaList(List<Cinema> cinemas) {
     List<Widget> cinemaWidgetList = [];
 
