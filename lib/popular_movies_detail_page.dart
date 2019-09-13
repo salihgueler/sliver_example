@@ -37,122 +37,26 @@ class _PopularMoviesDetailPageState extends State<PopularMoviesDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: getColorFromHex(widget.movie.backgroundColor),
-        middle: Text(widget.movie.title),
-      ),
-      child: AnimatedBuilder(
-        animation: _animationController,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            CupertinoSegmentedControl(
-              groupValue: currentValue,
-              children: const <int, Widget>{
-                0: Text('Storyline'),
-                1: Text('Tickets'),
-              },
-              onValueChanged: (value) {
-                if (value == 0) {
-                  currentTab = Padding(
-                    padding: EdgeInsets.only(left: 16, top: 16, right: 16),
-                    child: Text(widget.movie.plot),
-                  );
-                } else {
-                  currentTab = Padding(
-                    padding: EdgeInsets.only(left: 16, top: 16, right: 16),
-                    child: Column(
-                      children: _createCinemaList(widget.movie.cinemas),
-                    ),
-                  );
-                }
-                setState(() {
-                  currentValue = value;
-                });
-              },
+    return MaterialApp(
+      home: Scaffold(
+        // 2
+        body: CustomScrollView(
+          slivers: <Widget>[
+            // 3
+            SliverAppBar(
+              expandedHeight: 200.0,
+              backgroundColor: getColorFromHex(widget.movie.backgroundColor),
+              // 4
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text(widget.movie.title),
+                background: Image.asset(
+                  widget.movie.backdropImage,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-            currentTab ??
-                Padding(
-                  padding: EdgeInsets.only(left: 16, top: 16, right: 16),
-                  child: Text(widget.movie.plot),
-                )
           ],
         ),
-        builder: (context, child) {
-          return ListView(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Hero(
-                      tag: widget.movie.title,
-                      child: Image.asset(
-                        widget.movie.posterPath,
-                        height: 200,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 200,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(widget.movie.title),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: StarRating(
-                            rating: widget.movie.rate.toDouble(),
-                            color: Color(0xFFF6C32C),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: Icon(Icons.date_range),
-                              ),
-                              Text(widget.movie.releaseDate)
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: Icon(Icons.timer),
-                              ),
-                              Text(widget.movie.duration.toString())
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Opacity(
-                opacity: _animationController.value,
-                child: FractionalTranslation(
-                  translation: _movieInformationSlidingAnimation.value,
-                  child: child,
-                ),
-              )
-            ],
-          );
-        },
       ),
     );
   }
